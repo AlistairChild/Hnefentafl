@@ -166,6 +166,16 @@ class Game:
         is_enemy_right = self.is_enemy(pawn, pawn.inspect_cell(Position((pos.x+1, pos.y ))))
         is_enemy_left = self.is_enemy(pawn, pawn.inspect_cell(Position((pos.x-1, pos.y ))))
 
+        #if no enemy check if special square;
+        if not is_enemy_above:
+            is_enemy_above = self.is_special_square((pos.x, pos.y+1))
+        if not is_enemy_below:
+            is_enemy_below = self.is_special_square((pos.x , pos.y - 1))
+        if not is_enemy_right:
+            is_enemy_right = self.is_special_square((pos.x + 1, pos.y))
+        if not is_enemy_left:
+            is_enemy_left = self.is_special_square((pos.x - 1, pos.y))
+
         if isinstance(pawn, King):
             return is_enemy_above and is_enemy_below and is_enemy_right and is_enemy_left
         else:
@@ -174,5 +184,12 @@ class Game:
     def is_enemy(self, pawn1, pawn2):
         if pawn1 and pawn2:
             if isinstance(pawn1, Attacker) != isinstance(pawn2, Attacker):
+                return True
+        return False
+
+
+    def is_special_square(self, position):
+        for square in self.game_board.grid.special_squares:
+            if position == square:
                 return True
         return False

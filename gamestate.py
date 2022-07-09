@@ -3,7 +3,6 @@ from king import King
 from guides import Guides
 import pygame
 
-
 class State:
     def __init__(self):
         pass
