@@ -11,7 +11,6 @@ class Menuview:
         self.background = self.background.convert()
         self.background.fill((0, 0, 0))
 
-
         # Render the texts that you want to display
         text = font.render('Play Game', True, (0, 255, 0))
         # crete a rectangular object for the

@@ -13,7 +13,7 @@ class grid:
         '''
         passing the number of rows and cols create a grid to fit screen
         '''
-        self.special_squares = {(0,0),(0,row_number-1),(col_number -1,0),(col_number -1, row_number-1)}
+        self.special_squares = {(0,0),(0,row_number-1),(col_number -1,0),(col_number -1, row_number-1), (math.floor(col_number/2), math.floor(row_number/2))}
 
         #divide the screen width/height by the number of cols/rows get the cell/row width/height
         self.cellWidth = math.floor(screen.get_size()[0] / col_number)
