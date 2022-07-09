@@ -7,7 +7,7 @@ Hnefentafl written with Pythpn using pygame library
 
 This game requires pygame:
 ```
-sudo apt-get install python-pygame
+pip install pygame
 ```
 Run game using 
 
