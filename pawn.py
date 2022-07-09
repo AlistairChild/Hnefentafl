@@ -2,6 +2,8 @@ import pygame
 import math
 from globals import *
 
+
+
 class Pawn(pygame.sprite.Sprite):
 
     # Must override in sub-classes
@@ -11,7 +13,7 @@ class Pawn(pygame.sprite.Sprite):
         super().__init__()
 
         self.board = board
-        self.position = position
+        self.position = Position(position)
         # self.color = color
         self.radius = radius
         self.destroyed = False
@@ -19,7 +21,7 @@ class Pawn(pygame.sprite.Sprite):
         #print(team)
 
         self.image = pygame.Surface([2*self.radius , 2*self.radius ])
-
+        self.image.set_colorkey((0,0,0))
         pygame.draw.circle(self.image, color = self.color, center = (self.radius , self.radius ), radius= self.radius)
   
         self.rect = self.image.get_rect()
@@ -30,20 +32,19 @@ class Pawn(pygame.sprite.Sprite):
 
     def move(self, location):
         self.rect.x, self.rect.y  =  self.grid.get_screen_coordinates(location)
+        
         self.rect.x, self.rect.y = self.rect.x - self.radius, self.rect.y-self.radius
-        self.position = location
+        self.position = Position((location.x, location.y))
 
-    def update(self):
-        print("hi")
     
-    def calculate_possible_moves(self):
+    def calculate_possible_moves(self, is_king = False):
         '''Return list of grid coordinates'''
         moves = []
 
         # Up
         pos = self.position
-        while pos[1] > 0:
-            pos = (pos[0], pos[1] - 1)
+        while pos.y > 0:
+            pos = Position((pos.x, pos.y - 1))
             if self.inspect_cell(pos):
                 break # hit an obstacle
             else:
@@ -51,8 +52,8 @@ class Pawn(pygame.sprite.Sprite):
 
         # Down
         pos = self.position
-        while pos[1] < self.board.num_cols - 1:
-            pos = (pos[0], pos[1] + 1)
+        while pos.y < self.board.num_cols - 1:
+            pos = Position((pos.x, pos.y + 1))
             if self.inspect_cell(pos):
                 break # hit an obstacle
             else:
@@ -60,8 +61,8 @@ class Pawn(pygame.sprite.Sprite):
 
         # Left
         pos = self.position
-        while pos[0] > 0:
-            pos = (pos[0] - 1, pos[1])
+        while pos.x > 0:
+            pos = Position((pos.x - 1, pos.y))
             if self.inspect_cell(pos):
                 break # hit an obstacle
             else:
@@ -69,15 +70,21 @@ class Pawn(pygame.sprite.Sprite):
 
         # Right
         pos = self.position
-        while pos[0] < self.board.num_rows - 1:
-            pos = (pos[0] + 1, pos[1])
+        while pos.x < self.board.num_rows - 1:
+            pos = Position((pos.x + 1, pos.y))
             if self.inspect_cell(pos):
                 break # hit an obstacle
             else:
                 moves.append(pos)
+        
+        #Only the king is allowed in the special squares
+        if not is_king:
+            moves = [move for move in moves if (move.x,move.y) not in self.grid.special_squares ]
 
         return moves
 
-    def inspect_cell(self, location):
-        return self.board.get_cell_object(location)
+
+
+    def inspect_cell(self, position):
+        return self.board.get_cell_object(position)
         

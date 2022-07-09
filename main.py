@@ -13,9 +13,8 @@ pygame.display.set_caption('Hello World!')
 game = Game(screen)
 
 while True: # main game loop
-    screen.blit(game.game_board.grid.background, (0, 0))
-    game.game_board.all_sprites_list.draw(screen)
-    game.game_board.possible_moves_group.draw(screen)
+
+    game.draw()
 
     for event in pygame.event.get():
 

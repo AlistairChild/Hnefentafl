@@ -4,7 +4,7 @@ import pygame
 
 class King(Defender):
     
-    color = (0, 0, 255)
+    color = (20, 20, 255)
 
     def __init__(self, board, position):
-        super().__init__(board, position, PIECE_RADIUS)
+        super().__init__(board, position, PIECE_RADIUS*1.5)
