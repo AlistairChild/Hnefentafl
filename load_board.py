@@ -52,6 +52,7 @@ class board:
         return None
 
 
+
     def pawn_neighbours(self, pawn):
         pos = pawn.position
         n_positions = (Position((pos.x, pos.y + 1)), Position((pos.x, pos.y - 1)), Position((pos.x+1, pos.y)), Position((pos.x-1, pos.y)))

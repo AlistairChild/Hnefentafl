@@ -21,7 +21,6 @@ class Game:
 
     def draw(self):
 
-
         if isinstance(self.gamestate, Playing):
             self.screen.blit(self.game_board.grid.background, (0, 0))
             self.all_sprites_list.draw(self.screen)
@@ -55,11 +54,8 @@ class Game:
         if isinstance(self.gamestate, Finished):
             self.finishedview = FinishedView(self.screen, text)
             
-
-
-
     def mouse_handle(self, click_pos):
-        
+        '''handle the mouse event in accordance with the current game state'''
         if isinstance(self.gamestate, Menu):
             self.gamestate.on_event(click_pos)
 
@@ -69,18 +65,12 @@ class Game:
         elif isinstance(self.gamestate, Finished):
             self.gamestate.on_event(click_pos)
 
-            
-
     def turn_finished(self):
         if self.is_attckers_turn:
             self.is_attckers_turn = False
         else:
             self.is_attckers_turn = True
             
-
-    def print_winner(self):
-        print("winner")
-
     def defender_wins(self):
         self.change_game_state(Finished(self), "Defenders Win")
         
@@ -89,7 +79,10 @@ class Game:
         
     
     def check_for_winner(self, pawn):
-
+        '''
+        winner occurs either when the king escapes to a corner square, or, 
+        the king is surrounded by the attacking team.
+        '''
         #check if king made it to corner square
         if isinstance(pawn, King):
             x = pawn.position.x
@@ -101,18 +94,22 @@ class Game:
             if x == self.game_board.num_cols - 1 and y == self.game_board.num_rows - 1 or y == 0 and x == self.game_board.num_cols - 1:
                 self.defender_wins()
 
-
-
+        #check if king neighboures moved pawn
         for pawn in self.game_board.pawn_neighbours(pawn):
             if isinstance(pawn, King):
                 if self.is_king_taken(pawn):
                     self.attacker_wins()
             
 
-        #check if king neighboures moved pawn
-        #check if king is surrounded
 
     def is_king_taken(self, king):
+        '''
+        the King is taken when surrounded by enemy pieces on all avaliable sides.
+        if the king is on side of board it only needs to be surrounded by 3 pieces
+        if the king is neighboring the center square the king only needs be surrounded by 3 pieces
+
+        returns boolian
+        '''
         #check neighbours
         required_neighbours = 4
 
@@ -120,47 +117,38 @@ class Game:
         if king.position.y == 0 or king.position.x == 0 or king.position.x == self.game_board.num_cols or king.position.y == self.game_board.num_rows:
             required_neighbours -= 1
 
-        #is square above central
+        #is square above the central square 
         if king.position.y - 1 == (self.game_board.num_rows-1)/2 and king.position.x == (self.game_board.num_cols-1)/2:
             required_neighbours -= 1
-        #square below central
+        #is square below the central square 
         if king.position.y +1 == (self.game_board.num_rows-1)/2 and king.position.x == (self.game_board.num_cols-1)/2:
             required_neighbours -= 1
-        #square right central
+        #is square right the central square 
         if king.position.y == (self.game_board.num_rows-1)/2 and king.position.x +1  == (self.game_board.num_cols-1)/2:
             required_neighbours -= 1
-        #square left central
+        #is square left the central square 
         if king.position.y == (self.game_board.num_rows-1)/2 and king.position.x -1  == (self.game_board.num_cols-1)/2:
             required_neighbours -= 1
 
-        print(len(self.game_board.pawn_neighbours(king)))
-        for coord in self.game_board.pawn_neighbours(king):
-            if coord != None:
+        for pawn in self.game_board.pawn_neighbours(king):
+            if pawn != None and self.is_enemy(king, pawn):
                 required_neighbours -= 1
+
         return required_neighbours == 0
         
 
         
     def check_capture(self, pawn):
         '''
-        check both sides of the pawn in interest for a capture:
-         a capture takes place when a peice from one team has 2 peices either side of it either top/bottom or right left
-
-         - - -          - X -           - * -     - - - - - 
-         * X *   or     - * -   or      - X -     X * X X * 
-         - - -          - X -           - * -     - - - - - 
-        
+        only the moving piece can capture during their go
+        A pawn is taken when sandwiched between two enemys on opposed sides or 1 enemy and 1 special square
          ''' 
         
         taken_pawns = self.pawn_takes(pawn)
         for pawn in taken_pawns:
-            #delete pawn
-            if isinstance(pawn, King):
-                self.print_winner()
             pawn.kill()
 
     def pawn_takes(self, pawn):
-
         neighbours = self.game_board.pawn_neighbours(pawn)
 
         taken_pawns = []
@@ -173,7 +161,7 @@ class Game:
         '''check capture condition king has a different condition'''
         pos = pawn.position
 
-        is_enemy_above = self.is_enemy(pawn, pawn.inspect_cell(Position((pos.x, pos.y + 1))))
+        is_enemy_above = self.is_enemy(pawn, pawn.inspect_cell(Position((pos.x, pos.y + 1)))) 
         is_enemy_below = self.is_enemy(pawn, pawn.inspect_cell(Position((pos.x, pos.y - 1))))
         is_enemy_right = self.is_enemy(pawn, pawn.inspect_cell(Position((pos.x+1, pos.y ))))
         is_enemy_left = self.is_enemy(pawn, pawn.inspect_cell(Position((pos.x-1, pos.y ))))

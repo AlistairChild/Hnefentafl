@@ -1,6 +1,13 @@
 import math
 from globals import *
 
+def draw_special_square(canvas,top_left, cellWidth, cellHeight ,line_width):
+        '''visual design for squares reserved only for king'''
+        rect = pygame.Rect((top_left.x, top_left.y), (cellWidth ,cellHeight))
+        pygame.draw.rect(canvas, (50,50,50), rect)
+        pygame.draw.line(canvas,(100,100,100), (top_left.x, top_left.y), (top_left.x + cellWidth, top_left.y + cellHeight), width = line_width)
+        pygame.draw.line(canvas,(100,100,100), (top_left.x + cellWidth, top_left.y), (top_left.x, top_left.y + cellHeight), width = line_width)
+
 class grid:
     def __init__(self, screen, row_number, col_number):
         '''
@@ -21,43 +28,23 @@ class grid:
         self.background = self.background.convert()
         self.background.fill((0, 0, 0))
 
-        #draw grid onto the self.background      
+        #create special squares     
+        line_width = 4
         #top left  
-        rect = pygame.Rect((self.offsetx, self.offsety), (self.cellWidth ,self.cellHeight))
-        pygame.draw.rect(self.background, (50,50,50), rect)
-        pygame.draw.line(self.background,(100,100,100), (self.offsetx, self.offsety), (self.offsetx + self.cellWidth, self.offsety+self.cellHeight), width = 4)
-        pygame.draw.line(self.background,(100,100,100), (self.offsetx+ self.cellWidth, self.offsety), (self.offsetx, self.offsety+self.cellHeight), width = 4)
+        top_left = Position((self.offsetx, self.offsety))
+        draw_special_square(self.background, top_left, self.cellWidth, self.cellHeight, line_width)
         #bottom right
-        top_right_x = self.cellWidth*(col_number -1) + self.offsetx
-        top_right_y = self.cellHeight*(row_number-1)+self.offsety
-        rect = pygame.Rect((top_right_x, top_right_y), (self.cellWidth ,self.cellHeight))
-        pygame.draw.rect(self.background, (50,50,50), rect)
-        pygame.draw.line(self.background,(100,100,100), (top_right_x, top_right_y), (top_right_x+self.cellWidth , top_right_y+ self.cellHeight ), width = 4)
-        pygame.draw.line(self.background,(100,100,100), (top_right_x+ self.cellWidth, top_right_y), (top_right_x, top_right_y+self.cellHeight), width = 4)
-
+        top_left = Position((self.cellWidth*(col_number -1) + self.offsetx, self.cellHeight*(row_number-1)+self.offsety))
+        draw_special_square(self.background, top_left, self.cellWidth, self.cellHeight,line_width)
         #top right
-        top_right_x = self.cellWidth*(col_number -1) + self.offsetx
-        top_right_y = self.offsety
-        rect = pygame.Rect((self.cellWidth*(col_number -1)+ self.offsetx, self.offsety), (self.cellWidth ,self.cellHeight))
-        pygame.draw.rect(self.background, (50,50,50), rect)
-        pygame.draw.line(self.background,(100,100,100), (top_right_x, top_right_y), (top_right_x+self.cellWidth , top_right_y+ self.cellHeight ), width = 4)
-        pygame.draw.line(self.background,(100,100,100), (top_right_x+ self.cellWidth, top_right_y), (top_right_x, top_right_y+self.cellHeight), width = 4)
-
+        top_left = Position((self.cellWidth*(col_number -1) + self.offsetx, self.offsety))
+        draw_special_square(self.background, top_left, self.cellWidth, self.cellHeight,line_width)
         #bottom left
-        top_right_x = self.offsetx
-        top_right_y = self.cellHeight*(row_number-1)+self.offsety
-        rect = pygame.Rect((self.offsetx, self.cellHeight*(row_number-1)+self.offsety), (self.cellWidth ,self.cellHeight))
-        pygame.draw.rect(self.background, (50,50,50), rect)
-        pygame.draw.line(self.background,(100,100,100), (top_right_x, top_right_y), (top_right_x+self.cellWidth , top_right_y+ self.cellHeight), width = 4)
-        pygame.draw.line(self.background,(100,100,100), (top_right_x+ self.cellWidth, top_right_y), (top_right_x, top_right_y+self.cellHeight), width = 4)
-
+        top_left = Position((self.offsetx, self.cellHeight*(row_number-1)+self.offsety))
+        draw_special_square(self.background, top_left, self.cellWidth, self.cellHeight,line_width)
         #central
-        top_right_x = self.cellWidth*math.floor((col_number -1)/2) + self.offsetx
-        top_right_y = self.cellHeight*math.floor((row_number)/2)+self.offsety
-        rect = pygame.Rect((self.cellWidth*(math.floor(col_number/2))+ self.offsetx, self.cellHeight*(math.floor(row_number/2))+self.offsety), (self.cellWidth ,self.cellHeight))
-        pygame.draw.rect(self.background, (50,50,50), rect)
-        pygame.draw.line(self.background,(100,100,100), (top_right_x, top_right_y), (top_right_x+self.cellWidth , top_right_y+ self.cellHeight), width = 4)
-        pygame.draw.line(self.background,(100,100,100), (top_right_x+ self.cellWidth, top_right_y), (top_right_x, top_right_y+self.cellHeight), width = 4)
+        top_left = Position((self.cellWidth*math.floor((col_number -1)/2) + self.offsetx, self.cellHeight*math.floor((row_number)/2)+self.offsety))
+        draw_special_square(self.background, top_left, self.cellWidth, self.cellHeight,line_width)
 
         
         for x in range(col_number):
@@ -68,9 +55,7 @@ class grid:
                 rect = pygame.Rect(coords, (self.cellWidth ,self.cellHeight))
                 pygame.draw.rect(self.background, (100,100,100), rect,1)
 
-        # Display The self.background
-
-
+        #blit to screen
         screen.blit(self.background, (0, 0))
         
 

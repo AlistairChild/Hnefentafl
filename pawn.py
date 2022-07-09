@@ -14,26 +14,20 @@ class Pawn(pygame.sprite.Sprite):
 
         self.board = board
         self.position = Position(position)
-        # self.color = color
         self.radius = radius
-        self.destroyed = False
         self.grid = self.board.grid
-        #print(team)
 
-        self.image = pygame.Surface([2*self.radius , 2*self.radius ])
+        self.image = pygame.Surface([2*self.radius , 2*self.radius])
         self.image.set_colorkey((0,0,0))
         pygame.draw.circle(self.image, color = self.color, center = (self.radius , self.radius ), radius= self.radius)
   
         self.rect = self.image.get_rect()
-       
-        
-        self.rect.x, self.rect.y = self.grid.get_screen_coordinates(self.position)
-        self.rect.x, self.rect.y = self.rect.x - self.radius, self.rect.y-self.radius
+        x, y = self.grid.get_screen_coordinates(self.position)
+        self.rect.x, self.rect.y = x - self.radius, y - self.radius
 
     def move(self, location):
-        self.rect.x, self.rect.y  =  self.grid.get_screen_coordinates(location)
-        
-        self.rect.x, self.rect.y = self.rect.x - self.radius, self.rect.y-self.radius
+        x, y =  self.grid.get_screen_coordinates(location)
+        self.rect.x, self.rect.y = x - self.radius, y - self.radius
         self.position = Position((location.x, location.y))
 
     
