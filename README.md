@@ -17,6 +17,7 @@ python main.py
  A preview of the game:
 ![Hnefentafl board](/images/hnefentafl%20board.png)
 
+## Licence
 
-
+[MIT](LICENCE.txt)
 
