@@ -2,6 +2,10 @@ from attacker import Attacker
 from king import King
 from guides import Guides
 import pygame
+from menuview import MainMenuView
+from finishedview import FinishedView
+from board import Board
+from globals import *
 
 class State:
     def __init__(self):
@@ -12,12 +16,45 @@ class State:
 class Menu(State):
     def __init__(self, game):
         self.game = game
+        self.current_menu = MainMenuView(self, game)
+        self.changed = True
+        self.draw()
+        
+    def change_menu(self, menu):
+        self.current_menu = menu
+        self.changed = True
+
     def on_event(self, click_pos):
+        self.current_menu.evaluate()
+        
+    def draw(self):
+        if self.changed:
+            self.current_menu.draw()
+        self.changed = False
+
+    def change_game_state(self):
+        #next state is always Playing
         self.game.change_game_state(Playing(self.game))
+
+
 
 class Playing(State):
     def __init__(self, game):
         self.game = game
+        #generate sprite groups
+        self.game.all_sprites_list.empty()
+        self.game.possible_moves_group.empty()
+
+        #starts with attackers turn
+        self.game.is_attckers_turn = True
+
+        #create board and pieces
+        self.game.game_board = Board(self.game, BOARD_TYPES[self.game.board], self.game.screen)
+
+        self.game.game_board.generate_pieces()
+
+        self.game.possible_moves = []
+
     def on_event(self, click_pos):
 
         self.game.possible_moves_group.empty()
@@ -31,7 +68,7 @@ class Playing(State):
             else:
                 self.game.possible_moves = pawn.calculate_possible_moves()
             for coord in self.game.possible_moves:
-                self.game.possible_moves_group.add(Guides(self.game.game_board, (coord.x,coord.y)))
+                self.game.possible_moves_group.add(Guides(self.game.game_board, (coord.x, coord.y)))
                 self.game.active_pawn = pawn
 
 
@@ -46,8 +83,20 @@ class Playing(State):
         if not pawn:
             self.game.possible_moves_group.empty()
 
+    def draw(self):
+        #draw background
+        self.game.screen.blit(self.game.game_board.grid.background, (0, 0))
+        #draw all sprites
+        self.game.all_sprites_list.draw(self.game.screen)
+        #draw possible moves
+        self.game.possible_moves_group.draw(self.game.screen)
+
 class Finished(State):
     def __init__(self, game):
         self.game = game
+        self.finishedview = FinishedView(self.game.screen, self.game.win_message)
     def on_event(self, click_pos):
-        self.game.change_game_state(Playing(self.game))
+        self.game.change_game_state(Menu(self.game))
+    def draw(self):
+        self.finishedview.draw()
+        

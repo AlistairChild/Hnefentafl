@@ -1,4 +1,4 @@
-from load_board import *
+
 import pygame
 from globals import*
 from menuview import Menuview
@@ -8,62 +8,35 @@ from finishedview import FinishedView
 class Game:
     def __init__(self, screen):
         self.screen = screen
-        #generate sprite groups
+
+        #this will be moved to playing class
         self.all_sprites_list = pygame.sprite.Group()
         self.possible_moves_group = pygame.sprite.Group()
-
+        
         #starts with attackers turn
         self.is_attckers_turn = True
-
+        
+        self.board = list(BOARD_TYPES.keys())[0]
+        #starting game state is the main menu
         self.gamestate = Menu(self)
-        self.menuview = Menuview(screen)
 
+        self.win_message = None
 
     def draw(self):
+        self.gamestate.draw()
 
-        if isinstance(self.gamestate, Playing):
-            self.screen.blit(self.game_board.grid.background, (0, 0))
-            self.all_sprites_list.draw(self.screen)
-            self.possible_moves_group.draw(self.screen)
+    def change_board(self, board):
+        self.board = board
 
-
-    def change_game_state(self, state, text = None):
+    def change_game_state(self, state):
         #change the gamestate
         self.gamestate = state
-
-        if isinstance(self.gamestate, Menu):
-            #generate menu
-            self.menuview = Menuview(self.screen)
-
-
-        if isinstance(self.gamestate, Playing):
-            #generate sprite groups
-            self.all_sprites_list = pygame.sprite.Group()
-            self.possible_moves_group = pygame.sprite.Group()
-
-            #starts with attackers turn
-            self.is_attckers_turn = True
-
-            #create board and pieces
-            self.game_board = board(self, '/home/alistair/Desktop/vscode_projects/Hnefentafl/board.txt', self.screen)
-
-            self.game_board.generate_pieces()
-
-            self.possible_moves = []
-
-        if isinstance(self.gamestate, Finished):
-            self.finishedview = FinishedView(self.screen, text)
+        #draw the new gamestate
+        self.draw()
             
     def mouse_handle(self, click_pos):
         '''handle the mouse event in accordance with the current game state'''
-        if isinstance(self.gamestate, Menu):
-            self.gamestate.on_event(click_pos)
-
-        elif isinstance(self.gamestate, Playing):
-            self.gamestate.on_event(click_pos)
-
-        elif isinstance(self.gamestate, Finished):
-            self.gamestate.on_event(click_pos)
+        self.gamestate.on_event(click_pos)
 
     def turn_finished(self):
         if self.is_attckers_turn:
@@ -72,11 +45,12 @@ class Game:
             self.is_attckers_turn = True
             
     def defender_wins(self):
-        self.change_game_state(Finished(self), "Defenders Win")
+        self.win_message = "Defenders Win"
+        self.change_game_state(Finished(self))
         
     def attacker_wins(self):
-        self.change_game_state(Finished(self), "Attackers win")
-        
+        self.win_message = "Attackers win"
+        self.change_game_state(Finished(self))
     
     def check_for_winner(self, pawn):
         '''

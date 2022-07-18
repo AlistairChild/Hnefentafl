@@ -8,7 +8,7 @@ from globals import*
 import math
 from grid import *
 
-class board:
+class Board:
     """pass a path to a text file with the board layout to initialise"""
     def __init__(self, game, path, screen):
 
