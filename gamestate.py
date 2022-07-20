@@ -12,11 +12,16 @@ class State:
         pass
     def on_event(self):
         pass
-
+        
 class Menu(State):
-    def __init__(self, game):
-        self.game = game
-        self.current_menu = MainMenuView(self, game)
+    '''decides the gamerules and the board to build the game'''
+    def __init__(self, application):
+        self.application = application
+        self.current_menu = MainMenuView(self, application)
+
+        self.rules = Copenhagen_rules
+        self.board = self.rules.allowed_boards[0]
+
         self.changed = True
         self.draw()
         
@@ -32,64 +37,197 @@ class Menu(State):
             self.current_menu.draw()
         self.changed = False
 
-    def change_game_state(self):
-        #next state is always Playing
-        self.game.change_game_state(Playing(self.game))
+    def create_game(self):
+        self.application.build_game(self.rules, self.board)
 
 
-
-class Playing(State):
-    def __init__(self, game):
-        self.game = game
-        #generate sprite groups
-        self.game.all_sprites_list.empty()
-        self.game.possible_moves_group.empty()
+class Game(State):
+    def __init__(self, board):
+        self.board = board
+        self.screen = screen
 
         #starts with attackers turn
-        self.game.is_attckers_turn = True
+        self.is_attackers_turn = True
 
-        #create board and pieces
-        self.game.game_board = Board(self.game, BOARD_TYPES[self.game.board], self.game.screen)
+        #this will be moved to playing class
+        self.all_sprites_list = pygame.sprite.Group()
+        self.possible_moves_group = pygame.sprite.Group()
 
-        self.game.game_board.generate_pieces()
+        self.win_message = None
 
-        self.game.possible_moves = []
+        self.board.generate_pieces()
 
-    def on_event(self, click_pos):
+        self.possible_moves = []
 
-        self.game.possible_moves_group.empty()
-        grid_coords = self.game.game_board.grid.get_grid_coordinates(click_pos)
+
+    def check_for_winner(self, pawn):
+        #expect to be overriden depending on the gamerules
+        raise NotImplementedError
+
+    def check_capture(self, pawn):
+        #expect to be overriden depending on the gamerules
+        raise NotImplementedError
+
+    def on_event(self, click):
+        self.possible_moves_group.empty()
+        grid_coords = self.board.grid.get_grid_coordinates(click_pos)
         
-        pawn = self.game.game_board.get_cell_object(grid_coords)
+        pawn = self.board.get_cell_object(grid_coords)
 
-        if pawn and isinstance(pawn, Attacker) == self.game.is_attckers_turn:
+        if pawn and isinstance(pawn, Attacker) == self.is_attackers_turn:
             if isinstance(pawn, King):
-                self.game.possible_moves = pawn.calculate_possible_moves(True)
+                self.possible_moves = pawn.calculate_possible_moves(True)
             else:
-                self.game.possible_moves = pawn.calculate_possible_moves()
-            for coord in self.game.possible_moves:
-                self.game.possible_moves_group.add(Guides(self.game.game_board, (coord.x, coord.y)))
-                self.game.active_pawn = pawn
+                self.possible_moves = pawn.calculate_possible_moves()
+            for coord in self.possible_moves:
+                self.possible_moves_group.add(Guides(self.board, (coord.x, coord.y)))
+                self.active_pawn = pawn
 
 
-        for coord in self.game.possible_moves:
+        for coord in self.possible_moves:
             if coord.x == grid_coords.x and coord.y == grid_coords.y:
-                self.game.active_pawn.move(grid_coords)
-                self.game.check_for_winner(self.game.active_pawn)
-                self.game.check_capture(self.game.active_pawn)
-                self.game.turn_finished()
-                self.game.possible_moves = []
+                self.active_pawn.move(grid_coords)
+                self.check_for_winner(self.active_pawn)
+                self.check_capture(self.active_pawn)
+                self.turn_finished()
+                self.possible_moves = []
             
         if not pawn:
-            self.game.possible_moves_group.empty()
+            self.possible_moves_group.empty()
 
     def draw(self):
         #draw background
-        self.game.screen.blit(self.game.game_board.grid.background, (0, 0))
+        self.screen.blit(self.board.grid.background, (0, 0))
         #draw all sprites
-        self.game.all_sprites_list.draw(self.game.screen)
+        self.all_sprites_list.draw(self.screen)
         #draw possible moves
-        self.game.possible_moves_group.draw(self.game.screen)
+        self.possible_moves_group.draw(self.screen)
+
+class Copenhagen_rules(game):
+    allowed_boards = ["Hnefentafl", "tablut,..."]
+    def __init__(self, board):
+        super().__init__(board)
+
+    def check_for_winner(self, pawn):
+        '''
+        winner occurs either when the king escapes to a corner square, or, 
+        the king is surrounded by the attacking team.
+        '''
+        #check if king made it to corner square
+        if isinstance(pawn, King):
+            x = pawn.position.x
+            y = pawn.position.y
+
+            #check if king is in the corners
+            if x == 0 and y == 0 or x == 0 and y == self.game_board.num_rows - 1:
+                self.defender_wins()
+            if x == self.game_board.num_cols - 1 and y == self.game_board.num_rows - 1 or y == 0 and x == self.game_board.num_cols - 1:
+                self.defender_wins()
+
+        #check if king neighboures moved pawn
+        for pawn in self.game_board.pawn_neighbours(pawn):
+            if isinstance(pawn, King):
+                if self.is_king_taken(pawn):
+                    self.attacker_wins()
+
+    def check_capture(self, pawn):
+        '''
+        only the moving piece can capture during their go
+        A pawn is taken when sandwiched between two enemys on opposed sides or 1 enemy and 1 special square
+         ''' 
+        
+        taken_pawns = self.pawn_takes(pawn)
+        for pawn in taken_pawns:
+            pawn.kill()
+
+    def pawn_takes(self, pawn):
+        neighbours = self.game_board.pawn_neighbours(pawn)
+
+        taken_pawns = []
+        for pawn in neighbours:
+            if pawn and self.pawn_is_taken(pawn):
+                taken_pawns.append(pawn)
+        return taken_pawns
+
+    def pawn_is_taken(self, pawn):
+        '''check capture condition king has a different condition'''
+        pos = pawn.position
+
+        is_enemy_above = self.is_enemy(pawn, pawn.inspect_cell(Position((pos.x, pos.y + 1)))) 
+        is_enemy_below = self.is_enemy(pawn, pawn.inspect_cell(Position((pos.x, pos.y - 1))))
+        is_enemy_right = self.is_enemy(pawn, pawn.inspect_cell(Position((pos.x+1, pos.y ))))
+        is_enemy_left = self.is_enemy(pawn, pawn.inspect_cell(Position((pos.x-1, pos.y ))))
+
+        #if no enemy check if special square;
+        if not is_enemy_above:
+            is_enemy_above = self.is_special_square((pos.x, pos.y+1))
+        if not is_enemy_below:
+            is_enemy_below = self.is_special_square((pos.x , pos.y - 1))
+        if not is_enemy_right:
+            is_enemy_right = self.is_special_square((pos.x + 1, pos.y))
+        if not is_enemy_left:
+            is_enemy_left = self.is_special_square((pos.x - 1, pos.y))
+
+        if isinstance(pawn, King):
+            return is_enemy_above and is_enemy_below and is_enemy_right and is_enemy_left
+        else:
+            return (is_enemy_above and is_enemy_below) or (is_enemy_right and is_enemy_left)
+
+    def is_enemy(self, pawn1, pawn2):
+        if pawn1 and pawn2:
+            if isinstance(pawn1, Attacker) != isinstance(pawn2, Attacker):
+                return True
+        return False
+
+
+    def is_special_square(self, position):
+        for square in self.game_board.grid.special_squares:
+            if position == square:
+                return True
+        return False
+
+    def is_king_taken(self, king):
+        '''
+        the King is taken when surrounded by enemy pieces on all avaliable sides.
+        if the king is on side of board it only needs to be surrounded by 3 pieces
+        if the king is neighboring the center square the king only needs be surrounded by 3 pieces
+
+        returns boolian
+        '''
+        #check neighbours
+        required_neighbours = 4
+
+        #check if king surrounds by edge
+        if king.position.y == 0 or king.position.x == 0 or king.position.x == self.game_board.num_cols or king.position.y == self.game_board.num_rows:
+            required_neighbours -= 1
+
+        #is square above the central square 
+        if king.position.y - 1 == (self.game_board.num_rows-1)/2 and king.position.x == (self.game_board.num_cols-1)/2:
+            required_neighbours -= 1
+        #is square below the central square 
+        if king.position.y +1 == (self.game_board.num_rows-1)/2 and king.position.x == (self.game_board.num_cols-1)/2:
+            required_neighbours -= 1
+        #is square right the central square 
+        if king.position.y == (self.game_board.num_rows-1)/2 and king.position.x +1  == (self.game_board.num_cols-1)/2:
+            required_neighbours -= 1
+        #is square left the central square 
+        if king.position.y == (self.game_board.num_rows-1)/2 and king.position.x -1  == (self.game_board.num_cols-1)/2:
+            required_neighbours -= 1
+
+        for pawn in self.game_board.pawn_neighbours(king):
+            if pawn != None and self.is_enemy(king, pawn):
+                required_neighbours -= 1
+
+        return required_neighbours == 0
+        
+    def defender_wins(self):
+        self.win_message = "Defenders Win"
+        self.change_game_state(Finished(self))
+        
+    def attacker_wins(self):
+        self.win_message = "Attackers win"
+        self.change_game_state(Finished(self))
+
 
 class Finished(State):
     def __init__(self, game):

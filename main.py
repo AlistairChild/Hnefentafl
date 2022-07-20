@@ -10,7 +10,7 @@ screen = pygame.display.set_mode((900, 900))
 pygame.display.set_caption('Hello World!')
 
 
-game = Game(screen)
+application = application(screen)
 
 while True: # main game loop
 
@@ -27,9 +27,9 @@ while True: # main game loop
         if event.type == pygame.MOUSEBUTTONDOWN:
             mouse_presses = pygame.mouse.get_pressed()
             if mouse_presses[0]:
-                game.mouse_handle(pygame.mouse.get_pos())
+                application.mouse_handle(pygame.mouse.get_pos())
                 
-    game.draw()
+    application.update()
 
     pygame.display.flip()
 
