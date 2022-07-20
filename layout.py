@@ -3,6 +3,7 @@ from view import size
 from globals import *
 
 def calculate_button_layout(button_names):
+    '''returns a list of [top_right, size, label]'''
     n = len(button_names)
     button_height = calculate_button_height(n)
     gap = button_height / 4

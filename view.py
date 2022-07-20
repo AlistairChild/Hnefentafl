@@ -20,7 +20,6 @@ class Button:
         self.text = text
         self.parent = parent
         self.font = pygame.font.SysFont('freesanbold.ttf', 50)
-        
         self.draw()
 
     def draw(self):

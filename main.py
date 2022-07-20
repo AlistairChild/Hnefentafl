@@ -14,7 +14,7 @@ game = Game(screen)
 
 while True: # main game loop
 
-    game.draw()
+
 
     for event in pygame.event.get():
 
@@ -28,8 +28,9 @@ while True: # main game loop
             mouse_presses = pygame.mouse.get_pressed()
             if mouse_presses[0]:
                 game.mouse_handle(pygame.mouse.get_pos())
+                
+    game.draw()
 
-    pygame.display.update()
     pygame.display.flip()
 
 
