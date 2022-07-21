@@ -1,7 +1,7 @@
 
 # Hnefentafl
 
-Hnefentafl written with Pythpn using pygame library 
+A range of tafl games with multiple boards to choose from. 
 
 ## How to install
 

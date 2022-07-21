@@ -20,17 +20,34 @@ class Button:
         self.text = text
         self.parent = parent
         self.font = pygame.font.SysFont('freesanbold.ttf', 50)
+        self.subfont = pygame.font.SysFont('freesanbold.ttf', 25)
         self.draw()
 
     def draw(self):
         self.buttonSurface = pygame.Surface((self.size.x, self.size.y))
         self.buttonRect = pygame.Rect(self.pos.x, self.pos.y, self.size.x, self.size.y)
-        self.buttonSurf = self.font.render(self.text, True, (255, 255, 255))
         self.buttonSurface.fill((0,0,255))
-        self.buttonSurface.blit(self.buttonSurf , [
-            self.buttonRect.width/2 - self.buttonSurf.get_rect().width/2,
-            self.buttonRect.height/2 - self.buttonSurf.get_rect().height/2
-        ])
+
+        words = self.text.split("/n")
+        
+        for i in range(len(words)):
+            if i == 0:
+                
+                self.buttonSurf = self.font.render(words[i], True, (255, 255, 255))
+                self.buttonSurface.blit(self.buttonSurf , [
+                    self.buttonRect.width/2 - self.buttonSurf.get_rect().width/2,
+                    self.buttonRect.height/2 - self.buttonSurf.get_rect().height/2
+                ])
+            else:
+                
+                self.buttonSurf = self.subfont.render(words[i], True, (255, 255, 255))
+                self.buttonSurface.blit(self.buttonSurf , [
+                    self.buttonRect.width/2 - self.buttonSurf.get_rect().width/2,
+                    self.buttonRect.height/2 + self.buttonRect.height/4 - self.buttonSurf.get_rect().height/2
+                ])
+        
+        
+
 
         self.parent.background.blit(self.buttonSurface,self.buttonRect)
 

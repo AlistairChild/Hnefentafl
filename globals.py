@@ -1,8 +1,8 @@
 import pygame
 import math
 
-SCREEN_HEIGHT = 900
-SCREEN_WIDTH = 900
+SCREEN_HEIGHT = 800
+SCREEN_WIDTH = 800
 
 PIECE_RADIUS = 20
 
@@ -14,6 +14,8 @@ BOARD_TYPES = {
     'Tablut' : '/home/alistair/Desktop/vscode_projects/Hnefentafl/tablut_board.txt',
     'Tawlbwrdd' : '/home/alistair/Desktop/vscode_projects/Hnefentafl/tawlbwrdd_board.txt',
 }
+
+
 
 class Position:
     def __init__(self, position):
