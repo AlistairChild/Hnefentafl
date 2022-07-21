@@ -5,7 +5,7 @@ from view import Button
 from view import size
 from layout import calculate_button_height
 from layout import calculate_button_layout
-
+from boards import BOARDS
 
 class MainMenuView:
     def __init__(self, parent, game):
@@ -86,7 +86,7 @@ class GameTypeView:
         self.game = game
         self.parent = parent
         self.screen = game.screen
-        self.options = list(BOARD_TYPES.keys())
+        self.options = list(BOARDS.keys())
         self.background = pygame.Surface(self.screen.get_size())
         self.background = self.background.convert()
         self.background.fill((0, 0, 0))
