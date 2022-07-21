@@ -144,7 +144,10 @@ class Game(State):
         return False
 
 class Copenhagen_rules(Game):
+
+    #dependent on the rules only select boards are avaliable
     allowed_boards = ["Hnefentafl", "Alea Evangelii", "Ard Rí"]
+
     def __init__(self, application, board):
         super().__init__(application, board)
         
@@ -261,7 +264,9 @@ class Copenhagen_rules(Game):
 
 
 class Fetlar_rules(Game):
+    #dependent on the rules only select boards are avaliable
     allowed_boards = ["Hnefentafl"]
+
     def __init__(self, application, board):
         super().__init__(application, board)
 
@@ -375,7 +380,10 @@ class Fetlar_rules(Game):
         self.change_game_state(Finished(self))
 
 class Berserk_rules(Game):
+
+    #dependent on the rules only select boards are avaliable
     allowed_boards = ["Hnefentafl"]
+    
     def __init__(self, application, board):
         super().__init__(application, board)
 

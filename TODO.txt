@@ -1,0 +1,16 @@
++Implement the correct rules for the game types
+
++Neaten up the gamestate module
+
++remove all globals(not needed)
+
++create a package 
+
++create tests
+
++make button text automatically wrap
+
++update readme
+
++
+

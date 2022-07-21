@@ -9,6 +9,7 @@ from boards import BOARDS
 
 class MainMenuView:
     def __init__(self, parent, game):
+        
         self.game = game
         self.parent = parent
         self.screen = game.screen
@@ -38,7 +39,6 @@ class MainMenuView:
 
     def on_click(self, data):
         if data == self.options[0]:
-
             self.parent.create_game()
         elif data == self.options[1]:
             self.parent.change_menu(GameRulesMenu(self.parent, self.game))
