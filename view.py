@@ -32,7 +32,6 @@ class Button:
         
         for i in range(len(words)):
             if i == 0:
-                
                 self.buttonSurf = self.font.render(words[i], True, (255, 255, 255))
                 self.buttonSurface.blit(self.buttonSurf , [
                     self.buttonRect.width/2 - self.buttonSurf.get_rect().width/2,
@@ -46,9 +45,7 @@ class Button:
                     self.buttonRect.height/2 + self.buttonRect.height/4 - self.buttonSurf.get_rect().height/2
                 ])
         
-        
-
-
+    
         self.parent.background.blit(self.buttonSurface,self.buttonRect)
 
     def evaluate(self):

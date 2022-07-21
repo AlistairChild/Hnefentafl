@@ -13,9 +13,9 @@ black_cursor = pygame.image.load('images/Black_cursor.png').convert_alpha()
 red_cursor = pygame.image.load('images/red_cursor.png').convert_alpha()
 green_cursor = pygame.image.load('images/green_cursor.png').convert_alpha()
 
-black_cursor = pygame.transform.scale(black_cursor, (40, 40))
-green_cursor = pygame.transform.scale(green_cursor, (40, 40))
-red_cursor = pygame.transform.scale(red_cursor, (40, 40))
+black_cursor = pygame.transform.scale(black_cursor, (PIECE_RADIUS, PIECE_RADIUS))
+green_cursor = pygame.transform.scale(green_cursor, (2*PIECE_RADIUS, 2*PIECE_RADIUS))
+red_cursor = pygame.transform.scale(red_cursor, (2*PIECE_RADIUS, 2*PIECE_RADIUS))
 
 pygame.mouse.set_visible(False)
 cursor_img_rect = black_cursor.get_rect()

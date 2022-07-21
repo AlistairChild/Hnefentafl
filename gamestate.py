@@ -52,7 +52,7 @@ class Menu(State):
 
 class Game(State):
     def __init__(self, application, board):
-        
+        self.application = application
         self.screen = application.screen
         self.board = board
 
@@ -120,6 +120,27 @@ class Game(State):
         self.all_sprites_list.draw(self.screen)
         #draw possible moves
         self.possible_moves_group.draw(self.screen)
+
+    def defender_wins(self):
+        self.win_message = "Defenders Win"
+        self.application.show_credits()
+        
+    def attacker_wins(self):
+        self.win_message = "Attackers win"
+        self.application.show_credits()
+
+    def is_enemy(self, pawn1, pawn2):
+        if pawn1 and pawn2:
+            if isinstance(pawn1, Attacker) != isinstance(pawn2, Attacker):
+                return True
+        return False
+
+
+    def is_special_square(self, position):
+        for square in self.board.grid.special_squares:
+            if position == square:
+                return True
+        return False
 
 class Copenhagen_rules(Game):
     allowed_boards = ["Hnefentafl"]
@@ -201,19 +222,6 @@ class Copenhagen_rules(Game):
 
 
 
-    def is_enemy(self, pawn1, pawn2):
-        if pawn1 and pawn2:
-            if isinstance(pawn1, Attacker) != isinstance(pawn2, Attacker):
-                return True
-        return False
-
-
-    def is_special_square(self, position):
-        for square in self.board.grid.special_squares:
-            if position == square:
-                return True
-        return False
-
     def is_king_taken(self, king):
         '''
         the King is taken when surrounded by enemy pieces on all avaliable sides.
@@ -248,13 +256,7 @@ class Copenhagen_rules(Game):
 
         return required_neighbours == 0
         
-    def defender_wins(self):
-        self.win_message = "Defenders Win"
-        self.change_game_state(Finished(self))
-        
-    def attacker_wins(self):
-        self.win_message = "Attackers win"
-        self.change_game_state(Finished(self))
+
 
 
 class Fetlar_rules(Game):
@@ -327,18 +329,7 @@ class Fetlar_rules(Game):
         else:
             return (is_enemy_above and is_enemy_below) or (is_enemy_right and is_enemy_left)
 
-    def is_enemy(self, pawn1, pawn2):
-        if pawn1 and pawn2:
-            if isinstance(pawn1, Attacker) != isinstance(pawn2, Attacker):
-                return True
-        return False
 
-
-    def is_special_square(self, position):
-        for square in self.board.grid.special_squares:
-            if position == square:
-                return True
-        return False
 
     def is_king_taken(self, king):
         '''
@@ -452,18 +443,7 @@ class Berserk_rules(Game):
         else:
             return (is_enemy_above and is_enemy_below) or (is_enemy_right and is_enemy_left)
 
-    def is_enemy(self, pawn1, pawn2):
-        if pawn1 and pawn2:
-            if isinstance(pawn1, Attacker) != isinstance(pawn2, Attacker):
-                return True
-        return False
 
-
-    def is_special_square(self, position):
-        for square in self.board.grid.special_squares:
-            if position == square:
-                return True
-        return False
 
     def is_king_taken(self, king):
         '''
@@ -498,21 +478,17 @@ class Berserk_rules(Game):
                 required_neighbours -= 1
 
         return required_neighbours == 0
-        
-    def defender_wins(self):
-        self.win_message = "Defenders Win"
-        self.change_game_state(Finished(self))
-        
-    def attacker_wins(self):
-        self.win_message = "Attackers win"
-        self.change_game_state(Finished(self))
+
 
 class Finished(State):
-    def __init__(self, game):
-        self.game = game
-        #self.finishedview = FinishedView(self.game.screen, self.game.game.win_message)
+    def __init__(self, application):
+        self.application = application
+        self.game = application.game
+        self.finishedview = FinishedView(self.game)
+
     def on_event(self, click_pos):
-        self.game.change_game_state(Menu(self.game))
+        self.application.show_menu()
+
     def draw(self):
         self.finishedview.draw()
         

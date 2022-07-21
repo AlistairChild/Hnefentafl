@@ -15,6 +15,9 @@ class grid:
         '''
         self.special_squares = {(0,0),(0,row_number-1),(col_number -1,0),(col_number -1, row_number-1), (math.floor(col_number/2), math.floor(row_number/2))}
 
+        self.col_number = col_number
+        self.row_number = row_number
+
         #divide the screen width/height by the number of cols/rows get the cell/row width/height
         self.cellWidth = math.floor(screen.get_size()[0] / col_number)
         self.cellHeight = math.floor(screen.get_size()[1] / row_number)
@@ -28,36 +31,37 @@ class grid:
         self.background = self.background.convert()
         self.background.fill((0, 0, 0))
 
-        #create special squares     
-        line_width = 4
-        #top left  
-        top_left = Position((self.offsetx, self.offsety))
-        draw_special_square(self.background, top_left, self.cellWidth, self.cellHeight, line_width)
-        #bottom right
-        top_left = Position((self.cellWidth*(col_number -1) + self.offsetx, self.cellHeight*(row_number-1)+self.offsety))
-        draw_special_square(self.background, top_left, self.cellWidth, self.cellHeight,line_width)
-        #top right
-        top_left = Position((self.cellWidth*(col_number -1) + self.offsetx, self.offsety))
-        draw_special_square(self.background, top_left, self.cellWidth, self.cellHeight,line_width)
-        #bottom left
-        top_left = Position((self.offsetx, self.cellHeight*(row_number-1)+self.offsety))
-        draw_special_square(self.background, top_left, self.cellWidth, self.cellHeight,line_width)
-        #central
-        top_left = Position((self.cellWidth*math.floor((col_number -1)/2) + self.offsetx, self.cellHeight*math.floor((row_number)/2)+self.offsety))
-        draw_special_square(self.background, top_left, self.cellWidth, self.cellHeight,line_width)
+        #certain squares only the king can occupy
+        self.draw_restricted_squares()
 
-        
+        #draw the grid
         for x in range(col_number):
             for y in range(row_number):
                 coords = (x*self.cellWidth+self.offsetx, y*self.cellHeight+self.offsety )
-                
-                
                 rect = pygame.Rect(coords, (self.cellWidth ,self.cellHeight))
                 pygame.draw.rect(self.background, (100,100,100), rect,1)
 
         #blit to screen
         screen.blit(self.background, (0, 0))
         
+    def draw_restricted_squares(self):
+        #create special squares     
+        line_width = 4
+        #top left  
+        top_left = Position((self.offsetx, self.offsety))
+        draw_special_square(self.background, top_left, self.cellWidth, self.cellHeight, line_width)
+        #bottom right
+        top_left = Position((self.cellWidth*(self.col_number -1) + self.offsetx, self.cellHeight*(self.row_number-1)+self.offsety))
+        draw_special_square(self.background, top_left, self.cellWidth, self.cellHeight,line_width)
+        #top right
+        top_left = Position((self.cellWidth*(self.col_number -1) + self.offsetx, self.offsety))
+        draw_special_square(self.background, top_left, self.cellWidth, self.cellHeight,line_width)
+        #bottom left
+        top_left = Position((self.offsetx, self.cellHeight*(self.row_number-1)+self.offsety))
+        draw_special_square(self.background, top_left, self.cellWidth, self.cellHeight,line_width)
+        #central
+        top_left = Position((self.cellWidth*math.floor((self.col_number -1)/2) + self.offsetx, self.cellHeight*math.floor((self.row_number)/2)+self.offsety))
+        draw_special_square(self.background, top_left, self.cellWidth, self.cellHeight,line_width)
 
     def get_screen_coordinates(self, input_coords):
         '''

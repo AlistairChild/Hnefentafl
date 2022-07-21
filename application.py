@@ -16,7 +16,7 @@ class Application:
         
         self.screen = screen
         self.menu = Menu(self)
-        self.credits = Finished(self)
+        self.credits = None
     
         #the starting state is the menu state
         self.state = self.menu
@@ -28,16 +28,17 @@ class Application:
         '''build a game with the rules and board as selected in the menu'''
         # TODO: check board is compatible with game
 
-        game_instance = game(self, board)
-        
-
-        self.game = game_instance
+        self.game= game(self, board)
+   
         self.state = self.game
 
     def show_menu(self):
         self.state = self.menu
 
     def show_credits(self):
+
+        if not self.credits and self.game:
+            self.credits = Finished(self)
         self.state = self.credits
 
     def update(self):

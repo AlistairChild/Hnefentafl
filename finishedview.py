@@ -2,20 +2,20 @@ import pygame
 import math
 
 class FinishedView:
-    def __init__(self, screen, win_message):
+    def __init__(self, game):
         
         self.font = pygame.font.SysFont('freesanbold.ttf', 50)
-
-        self.screen = screen
-        self.background = pygame.Surface(screen.get_size())
+        self.game = game
+        self.screen = game.screen
+        self.background = pygame.Surface(self.screen.get_size())
         self.background = self.background.convert()
         self.background.fill((0, 0, 0))
-        self.winner_statement = win_message
+        self.winner_statement = self.game.win_message
         self.draw()
 
     def draw(self):
         # Render the texts that you want to display
-        text = self.font.render(self.winner_statement, True, (0, 255, 0))
+        text = self.font.render(self.game.win_message, True, (0, 255, 0))
         text1 = self.font.render("Click to restart", True, (0, 255, 0))
         # crete a rectangular object for the
         # text surface object
