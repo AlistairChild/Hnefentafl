@@ -144,7 +144,7 @@ class Game(State):
         return False
 
 class Copenhagen_rules(Game):
-    allowed_boards = ["Hnefentafl"]
+    allowed_boards = ["Hnefentafl", "Alea Evangelii", "Ard Rí"]
     def __init__(self, application, board):
         super().__init__(application, board)
         

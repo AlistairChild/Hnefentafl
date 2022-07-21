@@ -6,22 +6,23 @@ class Application:
     manages the current application state forwarding events to their handlers.
 
     '''
+    #TODO: change this 
     GAME_VARIATIONS = {
     "Copenhagen": Copenhagen_rules,
     "Fetlar Rules": Fetlar_rules,
     "Berserk": Berserk_rules
     }
-    
+
     def __init__(self, screen):
-        
         self.screen = screen
-        self.menu = Menu(self)
+        self.menu = None
         self.credits = None
-    
-        #the starting state is the menu state
-        self.state = self.menu
+
+        #show menu on application entry
+        self.show_menu()
 
     def handle_mouse_click(self, click_pos):
+        '''pass event to the current state'''
         self.state.on_event(click_pos)
 
     def build_game(self, game: Game, board):
@@ -32,13 +33,17 @@ class Application:
         self.state = self.game
 
     def show_menu(self):
+        '''create menu if not already else/ and set current state to menu'''
+        if not self.menu:
+            self.menu = Menu(self)
         self.state = self.menu
 
     def show_credits(self):
-
+        '''create credits if not already else/ and set current state to credits'''
         if not self.credits and self.game:
             self.credits = Finished(self)
         self.state = self.credits
 
     def update(self):
+        '''forward call to the current state'''
         self.state.draw()

@@ -41,11 +41,11 @@ class MainMenuView:
 
             self.parent.create_game()
         elif data == self.options[1]:
-            self.parent.change_menu(GameRuleVariation(self.parent, self.game))
+            self.parent.change_menu(GameRulesMenu(self.parent, self.game))
         elif data == self.options[2]:
-            self.parent.change_menu(GameTypeView(self.parent, self.game))
+            self.parent.change_menu(BoardMenu(self.parent, self.game))
 
-class GameRuleVariation:
+class GameRulesMenu:
     def __init__(self, parent, game):
         self.game = game
         self.parent = parent
@@ -81,12 +81,12 @@ class GameRuleVariation:
         self.parent.change_menu(MainMenuView(self.parent, self.game))
 
        
-class GameTypeView:
-    def __init__(self, parent, game):
-        self.game = game
+class BoardMenu:
+    def __init__(self, parent, application):
+        self.application = application
         self.parent = parent
-        self.screen = game.screen
-        self.options = list(BOARDS.keys())
+        self.screen = application.screen
+        self.options = list(self.application.GAME_VARIATIONS[self.parent.rules].allowed_boards)
         self.background = pygame.Surface(self.screen.get_size())
         self.background = self.background.convert()
         self.background.fill((0, 0, 0))
@@ -113,7 +113,7 @@ class GameTypeView:
 
     def on_click(self, data):
         self.parent.change_board(data)
-        self.parent.change_menu(MainMenuView(self.parent, self.game))
+        self.parent.change_menu(MainMenuView(self.parent, self.application))
 
         
 
