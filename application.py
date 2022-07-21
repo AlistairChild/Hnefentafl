@@ -27,7 +27,6 @@ class Application:
     def build_game(self, game: Game, board):
         '''build a game with the rules and board as selected in the menu'''
         # TODO: check board is compatible with game
-
         self.game= game(self, board)
    
         self.state = self.game

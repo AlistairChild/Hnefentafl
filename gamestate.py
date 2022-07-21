@@ -6,6 +6,7 @@ from menuview import MainMenuView
 from finishedview import FinishedView
 from board import Board
 from globals import *
+from boards import *
 
 class State:
     def __init__(self):
@@ -56,7 +57,7 @@ class Game(State):
         self.screen = application.screen
         self.board = board
 
-        self.board = Board(self, BOARD_TYPES[self.board], self.screen)
+        self.board = Board(self, self.board, self.screen)
 
         #starts with attackers turn
         self.is_attackers_turn = True

@@ -7,20 +7,15 @@ import pygame
 from globals import*
 import math
 from grid import *
+from boards import *
 
 class Board:
-    """pass a path to a text file with the board layout to initialise"""
+    '''holds the grid and pieces'''
     def __init__(self, game, path, screen):
 
         self.screen = screen
-        self.file = open(path, 'r')
-        self.cells = []
+        self.cells = BOARDS[path]
         self.game = game
-        
-        rows = self.file.read().splitlines()
-        self.image = pygame.Surface((PIECE_RADIUS, PIECE_RADIUS))
-        for item in rows:
-            self.cells.append(item.split(" "))
 
         self.num_rows = len(self.cells)
         self.num_cols = len(self.cells[0]) 
@@ -32,13 +27,13 @@ class Board:
     def generate_pieces(self):
         for i in range(len(self.cells)):
             for j in range(len(self.cells[0])):
-                if self.cells[i][j] == "0":
+                if self.cells[i][j] == 0:
                     self.characters[i][j] = None
-                elif self.cells[i][j] == "1":
+                elif self.cells[i][j] == 1:
                     self.game.all_sprites_list.add(Attacker(self, (i,j)))
-                elif self.cells[i][j] == "2":
+                elif self.cells[i][j] == 2:
                     self.game.all_sprites_list.add(Defender(self, (i,j)))
-                elif self.cells[i][j] == "3":  
+                elif self.cells[i][j] == 3:  
                     self.game.all_sprites_list.add(King(self, (i,j)))
                 else:
                     print("Please assign piece number %s an object" %self.cells[i][j])
@@ -50,8 +45,6 @@ class Board:
             if sprite.position.x == position.x and sprite.position.y == position.y:
                 return sprite
         return None
-
-
 
     def pawn_neighbours(self, pawn):
         pos = pawn.position
